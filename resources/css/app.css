@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+	.admin-shell .rounded-2xl {
+		border-radius: 0.65rem;
+	}
+
+	.admin-shell .rounded-xl {
+		border-radius: 0.5rem;
+	}
+
+	.login-page {
+		isolation: isolate;
+	}
+
+	.login-content {
+		position: relative;
+		z-index: 2;
+	}
+}
+
+@layer utilities {
+	@keyframes bubble-float {
+		0%, 100% {
+			transform: translate3d(0, 0, 0);
+		}
+
+		50% {
+			transform: translate3d(0, -18px, 0);
+		}
+	}
+
+	.bubble-float {
+		animation: bubble-float 12s ease-in-out infinite;
+	}
+
+	.bubble-float-reverse {
+		animation: bubble-float 15s ease-in-out infinite reverse;
+	}
+}
