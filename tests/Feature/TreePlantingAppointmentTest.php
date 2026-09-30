@@ -8,7 +8,9 @@ use App\Models\Requirement;
 use App\Models\TreePlantingAppointment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
@@ -125,6 +127,50 @@ class TreePlantingAppointmentTest extends TestCase
             'id' => $appointment->id,
             'status' => 'onprocess',
         ]);
+    }
+
+    public function test_user_can_upload_all_required_documents_and_receive_json(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create([
+            'role' => 'User',
+            'email' => 'resident@example.com',
+        ]);
+
+        $area = Area::create([
+            'location_name' => 'Barangay San Luis',
+            'area_type' => 'Residential',
+            'corners' => [
+                ['name' => 'Corner 1', 'coordinates' => '8.5001,124.6001'],
+            ],
+            'status' => 'active',
+        ]);
+
+        $appointment = TreePlantingAppointment::create([
+            'user_id' => $user->id,
+            'area_id' => $area->id,
+            'appointment_type' => 'couple',
+            'service_category' => 'Tree Planting',
+            'status' => 'onprocess',
+        ]);
+
+        $this->actingAs($user)
+            ->post('/appointments/' . $appointment->id . '/requirements', [
+                'images' => [
+                    'OR for Tree Planting' => UploadedFile::fake()->create('receipt.pdf', 10, 'application/pdf'),
+                    'Proof of Planting' => UploadedFile::fake()->create('planting.pdf', 10, 'application/pdf'),
+                ],
+            ], ['Accept' => 'application/json'])
+            ->assertOk()
+            ->assertJsonPath('message', 'Requirements uploaded successfully.')
+            ->assertJsonCount(2, 'images');
+
+        $requirement = Requirement::where('appointment_id', $appointment->id)->firstOrFail();
+        $this->assertCount(2, $requirement->images);
+        foreach ($requirement->images as $image) {
+            Storage::disk('public')->assertExists($image['path']);
+        }
     }
 
     public function test_admin_can_view_certificates_grouped_by_service(): void

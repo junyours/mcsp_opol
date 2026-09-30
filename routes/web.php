@@ -163,7 +163,7 @@ Route::get('/staff/dashboard', function () {
     $appointments = \App\Models\TreePlantingAppointment::query()
         ->where('assigned_to', request()->user()->id)
         ->with(['user:id,name,email', 'area:id,location_name', 'members:id,appointment_id,address'])
-        ->with(['assignee:id,name,email', 'assignee.profilePicture:id,user_id,image'])
+        ->with(['assignee:id,name,email', 'assignee.profilePicture:id,user_id,image_path'])
         ->withCount('members')
         ->latest()
         ->get();
@@ -177,7 +177,7 @@ Route::get('/staff/assigned-jobs', function () {
     $appointments = \App\Models\TreePlantingAppointment::query()
         ->where('assigned_to', request()->user()->id)
         ->with(['user:id,name,email', 'area:id,location_name'])
-        ->with(['assignee:id,name,email', 'assignee.profilePicture:id,user_id,image', 'inventoryRequests.seedling:id,name,unit,quantity', 'members'])
+        ->with(['assignee:id,name,email', 'assignee.profilePicture:id,user_id,image_path', 'inventoryRequests.seedling:id,name,unit,quantity', 'members'])
         ->withCount('members')
         ->latest()
         ->get();
@@ -193,7 +193,7 @@ Route::get('/staff/history', function () {
         ->where('assigned_to', request()->user()->id)
         ->whereIn('status', ['approved', 'completed'])
         ->with(['user:id,name,email', 'area:id,location_name'])
-        ->with(['assignee:id,name,email', 'assignee.profilePicture:id,user_id,image', 'inventoryRequests.seedling:id,name,unit,quantity', 'members'])
+        ->with(['assignee:id,name,email', 'assignee.profilePicture:id,user_id,image_path', 'inventoryRequests.seedling:id,name,unit,quantity', 'members'])
         ->withCount('members')
         ->latest()
         ->get();
@@ -214,7 +214,7 @@ Route::get('/treasury/statement-of-accounts', function () {
     ]);
 })->middleware(['auth', 'verified', 'treasury'])->name('treasury.statement-accounts');
 
-Route::patch('/treasury/appointments/{appointment}/confirm', [TreePlantingAppointmentController::class, 'approve'])
+Route::patch('/treasury/appointments/{appointment}/confirm', [TreePlantingAppointmentController::class, 'confirmForTreasury'])
     ->middleware(['auth', 'verified', 'treasury'])
     ->name('treasury.appointments.confirm');
 Route::patch('/treasury/appointments/{appointment}/reject', [TreePlantingAppointmentController::class, 'decline'])

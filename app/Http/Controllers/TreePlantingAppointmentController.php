@@ -157,6 +157,13 @@ class TreePlantingAppointmentController extends Controller
         return back()->with('success', 'Appointment approved successfully.');
     }
 
+    public function confirmForTreasury(TreePlantingAppointment $appointment): RedirectResponse
+    {
+        $this->updateStatusAndNotify($appointment, 'confirmed');
+
+        return back()->with('success', 'Appointment confirmed successfully.');
+    }
+
     public function decline(TreePlantingAppointment $appointment): RedirectResponse
     {
         $this->updateStatusAndNotify($appointment, 'rejected');
@@ -187,7 +194,7 @@ class TreePlantingAppointmentController extends Controller
         return back()->with('success', 'Appointment completed successfully.');
     }
 
-    public function storeRequirements(Request $request, TreePlantingAppointment $appointment): RedirectResponse
+    public function storeRequirements(Request $request, TreePlantingAppointment $appointment): JsonResponse
     {
         abort_unless($request->user()->id === $appointment->user_id, 403);
 
@@ -202,18 +209,18 @@ class TreePlantingAppointmentController extends Controller
         $files = $request->file('images', []);
 
         if (empty($files) || count($files) !== count($requiredDocuments) || array_diff($requiredDocuments, array_keys($files))) {
-            return back()->withErrors(['requirements' => 'Please upload every required document for this service.']);
+            return response()->json(['message' => 'Please upload every required document for this service.'], 422);
         }
 
         $storedImages = [];
 
         foreach ($files as $documentName => $file) {
             if (! $file instanceof \Illuminate\Http\UploadedFile || ! $file->isValid()) {
-                return back()->withErrors(['requirements' => 'One or more uploaded files are invalid.']);
+                return response()->json(['message' => 'One or more uploaded files are invalid.'], 422);
             }
 
             if (! in_array($documentName, $requiredDocuments, true)) {
-                return back()->withErrors(['requirements' => 'The uploaded document is not allowed for this service.']);
+                return response()->json(['message' => 'The uploaded document is not allowed for this service.'], 422);
             }
 
             $extension = strtolower((string) $file->getClientOriginalExtension() ?: pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION));
@@ -225,7 +232,7 @@ class TreePlantingAppointmentController extends Controller
             );
 
             if (! is_string($storedPath)) {
-                return back()->withErrors(['requirements' => 'The uploaded documents could not be saved.']);
+                return response()->json(['message' => 'The uploaded documents could not be saved.'], 500);
             }
 
             $storedImages[] = [
@@ -237,12 +244,15 @@ class TreePlantingAppointmentController extends Controller
             ];
         }
 
-        Requirement::updateOrCreate(
+        $requirement = Requirement::updateOrCreate(
             ['appointment_id' => $appointment->id],
             ['images' => $storedImages],
         );
 
-        return back()->with('success', 'Requirements uploaded successfully.');
+        return response()->json([
+            'message' => 'Requirements uploaded successfully.',
+            'images' => $requirement->images,
+        ]);
     }
 
     public function deleteRequirements(Request $request, TreePlantingAppointment $appointment): JsonResponse

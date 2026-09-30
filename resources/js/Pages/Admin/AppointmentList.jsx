@@ -299,7 +299,7 @@ export default function AppointmentList({ auth, appointments = [], staff = [], u
         const matchesStatus = statusFilter === 'approved'
             ? normalizedStatus === 'approved'
             : statusFilter === 'all'
-                ? normalizedStatus !== 'approved'
+                ? !['approved', 'rejected', 'declined'].includes(normalizedStatus)
                 : normalizedStatus === String(statusFilter).toLowerCase();
 
         return matchesSearch && matchesStatus;

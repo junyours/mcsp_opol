@@ -226,7 +226,7 @@ export default function AppointmentMembers({ auth, appointment }) {
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                             <div>
                                 <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-lime-200">Appointment #{appointment.id}</p>
-                                <h1 className="mt-3 text-3xl font-black tracking-[-0.05em] text-white">{appointment.organization_name || 'Couple appointment'}</h1>
+                                <h1 className="mt-3 text-3xl font-black tracking-[-0.05em] text-white">{appointment.organization_name || 'Manage Appointments'}</h1>
                                 <p className="mt-2 text-sm text-emerald-100">Submitted by {appointment.user?.name} · {appointment.area?.location_name ?? appointment.area_name ?? 'No area selected'}</p>
                             </div>
                             <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold capitalize text-lime-200 ring-1 ring-white/15">{appointment.status}</span>
@@ -378,12 +378,12 @@ export default function AppointmentMembers({ auth, appointment }) {
                             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700">Participant records</p>
                             <h2 className="mt-1 text-xl font-black tracking-[-0.03em] text-slate-900">Submitted members</h2>
                         </div>
-                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                            <button type="button" onClick={() => { setScanResult(null); setScanError(''); setScannerOpen(true); }} className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-950 px-3.5 py-2.5 text-xs font-bold uppercase tracking-[0.08em] text-white shadow-[0_8px_18px_rgba(15,45,90,0.18)] transition hover:bg-blue-900">
+                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:flex xl:items-center">
+                            <button type="button" onClick={() => { setScanResult(null); setScanError(''); setScannerOpen(true); }} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-950 px-3.5 py-2.5 text-xs font-bold uppercase tracking-[0.08em] text-white shadow-[0_8px_18px_rgba(15,45,90,0.18)] transition hover:bg-blue-900 xl:w-auto">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2M18 14h2M14 18h2M18 18h2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                                 Scan attendance
                             </button>
-                        <label className="relative">
+                        <label className="relative sm:col-span-2 xl:col-auto">
                             <span className="sr-only">Search members</span>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400">
                                 <circle cx="11" cy="11" r="8" />
@@ -391,16 +391,16 @@ export default function AppointmentMembers({ auth, appointment }) {
                             </svg>
                             <input value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search members" className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-xs outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 sm:w-64" />
                         </label>
-                            <select value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)} aria-label="Filter by role" className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+                            <select value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)} aria-label="Filter by role" className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 xl:w-auto">
                                 <option value="all">All roles</option>
                                 {[...new Set((appointment.members ?? []).map((member) => String(member.role || 'member').toLowerCase()))].map((role) => <option key={role} value={role}>{role}</option>)}
                             </select>
-                            <select value={attendanceFilter} onChange={(event) => setAttendanceFilter(event.target.value)} aria-label="Filter by attendance" className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+                            <select value={attendanceFilter} onChange={(event) => setAttendanceFilter(event.target.value)} aria-label="Filter by attendance" className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 xl:w-auto">
                                 <option value="all">All attendance</option>
                                 <option value="present">Present</option>
                                 <option value="non-present">Non-present</option>
                             </select>
-                            <button type="button" onClick={downloadExcel} className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-950 px-3.5 py-2.5 text-xs font-bold uppercase tracking-[0.08em] text-white shadow-[0_8px_18px_rgba(15,45,90,0.18)] transition hover:bg-blue-900">
+                            <button type="button" onClick={downloadExcel} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-950 px-3.5 py-2.5 text-xs font-bold uppercase tracking-[0.08em] text-white shadow-[0_8px_18px_rgba(15,45,90,0.18)] transition hover:bg-blue-900 xl:w-auto">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4"><path d="M12 4v11M7 11l5 5 5-5M5 20h14" strokeLinecap="round" strokeLinejoin="round" /></svg>
                                 Export Excel
                             </button>
@@ -415,7 +415,46 @@ export default function AppointmentMembers({ auth, appointment }) {
                             </div>
                             <span className="rounded-full bg-blue-950 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-blue-100">{filteredMembers.length} records</span>
                         </div>
-                        <div className="overflow-x-auto">
+                        <div className="grid gap-3 p-3 xl:hidden">
+                            {filteredMembers.map((member, index) => {
+                                const memberName = formatMemberName(member);
+                                const isPresent = member.attendance === 'present';
+
+                                return (
+                                    <article key={member.id} className="min-w-0 rounded-xl border border-blue-100 bg-white p-4 shadow-sm">
+                                        <div className="flex min-w-0 items-start gap-3">
+                                            {member.profile_picture ? (
+                                                <img src={member.profile_picture} alt={`${memberName} profile`} className="h-12 w-12 shrink-0 rounded-xl border border-blue-100 object-cover" />
+                                            ) : (
+                                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-xs font-bold text-blue-700">{memberName.charAt(0) || '?'}</div>
+                                            )}
+                                            <div className="min-w-0 flex-1">
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-blue-600">#{String(index + 1).padStart(2, '0')}</span>
+                                                    <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold capitalize text-blue-800">{member.role || 'member'}</span>
+                                                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize ${isPresent ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>{member.attendance || 'non-present'}</span>
+                                                </div>
+                                                <h3 className="mt-1 break-words text-sm font-bold text-blue-950">{memberName}</h3>
+                                            </div>
+                                        </div>
+                                        <dl className="mt-4 grid min-w-0 grid-cols-1 gap-3 border-t border-slate-100 pt-3 text-xs sm:grid-cols-2">
+                                            <div className="min-w-0"><dt className="font-semibold text-slate-500">Phone</dt><dd className="mt-0.5 break-words text-slate-800">{member.phone_number || 'Not provided'}</dd></div>
+                                            <div className="min-w-0"><dt className="font-semibold text-slate-500">Email</dt><dd className="mt-0.5 break-all text-slate-800">{member.email || 'Not provided'}</dd></div>
+                                            <div className="min-w-0 sm:col-span-2"><dt className="font-semibold text-slate-500">Address</dt><dd className="mt-0.5 break-words text-slate-800">{member.address || 'Not provided'}</dd></div>
+                                            <div className="min-w-0 sm:col-span-2"><dt className="font-semibold text-slate-500">Time in</dt><dd className="mt-0.5 text-slate-800">{formatTimeIn(member.time_in)}</dd></div>
+                                        </dl>
+                                        <div className="mt-3 flex flex-wrap gap-2 border-t border-slate-100 pt-3">
+                                            {member.qrcode && <button type="button" onClick={() => setSelectedQrCode(member)} className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 transition hover:bg-blue-100"><img src={member.qrcode} alt="" className="h-6 w-6 rounded bg-white object-contain" />View QR</button>}
+                                            <button type="button" onClick={() => deleteMember(member)} className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 transition hover:bg-rose-100">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                                Delete member
+                                            </button>
+                                        </div>
+                                    </article>
+                                );
+                            })}
+                        </div>
+                        <div className="hidden overflow-x-auto xl:block">
                             <table className="min-w-[1400px] w-full border-collapse text-left text-sm">
                                 <thead className="bg-blue-950 text-blue-50">
                                     <tr className="text-[10px] font-bold uppercase tracking-[0.14em]">

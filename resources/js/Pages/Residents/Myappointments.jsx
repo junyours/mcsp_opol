@@ -214,15 +214,15 @@ export default function Myappointments({ auth, appointments = [] }) {
 
 		setUploadingRequirements(true);
 		window.axios.post(route('appointments.requirements.store', selectedAppointment.id), formData, {
-			headers: { 'Content-Type': 'multipart/form-data' },
-		}).then(() => {
+			headers: { Accept: 'application/json' },
+		}).then(({ data }) => {
 			setSelectedAppointment((current) => ({
 				...current,
-				requirements: { images: documents.map((name) => ({ name, mime: requirementFiles[name]?.mime || 'application/octet-stream', size: requirementFiles[name]?.size || 0 })) },
+				requirements: { images: data.images },
 			}));
 			setRequirementsUploaded(true);
-		}).catch(() => {
-			window.alert('The requirements could not be uploaded. Please check every document and try again.');
+		}).catch((error) => {
+			window.alert(error.response?.data?.message || 'The requirements could not be uploaded. Please check every document and try again.');
 		}).finally(() => setUploadingRequirements(false));
 	};
 
@@ -453,7 +453,7 @@ export default function Myappointments({ auth, appointments = [] }) {
 											{selectedAppointment.requirements?.images?.length ? (
 												<p className="mt-4 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-blue-700">Requirements already uploaded.</p>
 											) : (
-												<div className="mt-4 space-y-3">
+												<div className="mt-4 space-y-3 [&>div.border-rose-200]:hidden">
 																<div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700">
 																	Requirements were removed. Please upload the required documents again.
 																</div>															<div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700">
